@@ -30,10 +30,12 @@ export async function submitTechnicianApplication(formData: FormData) {
   const longitude = parseFloat(lngStr);
 
   // Ensure profile exists to satisfy foreign key
+  const avatarUrl = formData.get('avatarUrl') as string | null;
   const { error: profileError } = await supabase.from('profiles').upsert({
     id: userId,
     display_name: fullName,
-    role: 'technician'
+    role: 'technician',
+    ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
   }, { onConflict: 'id' });
   
   if (profileError) console.error("Profile upsert error:", profileError);
@@ -74,13 +76,13 @@ export async function submitTechnicianApplication(formData: FormData) {
     throw new Error(`ไม่สามารถบันทึกข้อมูลได้: ${error.message}`);
   }
 
-  // Auto-create profile for MVP so it shows up on homepage immediately
+  // Auto-create technician_profiles (is_verified=false จนกว่าแอดมินจะยืนยันบัตรประชาชน)
   // ใช้ adminSupabase เพราะ technician_profiles ไม่มี INSERT policy (RLS)
   if (appData) {
     const { error: profileInsertError } = await adminSupabase.from('technician_profiles').insert({
       user_id: userId,
       application_id: appData.id,
-      is_verified: true,
+      is_verified: false,
       rating_avg: 5.0,
       review_count: 0
     });

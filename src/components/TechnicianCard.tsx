@@ -8,6 +8,7 @@ interface TechnicianCardProps {
   id: string;
   name: string;
   category: string;
+  avatarUrl?: string | null;
   isVerified: boolean;
   isFeatured: boolean;
   rating: number;
@@ -20,6 +21,7 @@ export default function TechnicianCard({
   id,
   name,
   category,
+  avatarUrl,
   isVerified,
   isFeatured,
   rating,
@@ -94,7 +96,13 @@ export default function TechnicianCard({
         </div>
       </div>
       <div className={styles.imagePlaceholder}>
-        รูปช่าง
+        {avatarUrl ? (
+          <img src={avatarUrl} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />
+        ) : (
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontSize: '13px' }}>
+            รูปช่าง
+          </div>
+        )}
       </div>
     </div>
   );

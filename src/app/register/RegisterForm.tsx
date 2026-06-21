@@ -75,9 +75,10 @@ export default function RegisterForm({ categories, submitAction }: { categories:
           </p>
         </div>
 
-        {/* Hidden Fields for Geolocation */}
+        {/* Hidden Fields */}
         {lat && <input type="hidden" name="latitude" value={lat} />}
         {lng && <input type="hidden" name="longitude" value={lng} />}
+        {profile?.pictureUrl && <input type="hidden" name="avatarUrl" value={profile.pictureUrl} />}
         
         <div className={styles.formGroup}>
           <label htmlFor="fullName">ชื่อ-นามสกุลจริง</label>

@@ -51,8 +51,14 @@ export default async function Home() {
       supabase.from('technician_profiles')
         .select(`
           *,
-          technician_applications!inner(full_name, category_id, experience_years),
-          profiles!inner(display_name)
+          technician_applications!inner(
+            full_name,
+            experience_years,
+            latitude,
+            longitude,
+            service_categories!inner(name_th)
+          ),
+          profiles!inner(display_name, avatar_url)
         `)
         .limit(8)
     ]);
@@ -77,14 +83,15 @@ export default async function Home() {
   const technicians = dbTechnicians && dbTechnicians.length > 0 ? dbTechnicians.map(t => ({
     id: t.id,
     name: t.profiles?.display_name || t.technician_applications?.full_name || 'ช่างนิรนาม',
-    category: t.technician_applications?.category_id || 'ทั่วไป', // Should join with service_categories ideally
+    category: (t.technician_applications as any)?.service_categories?.name_th || 'ทั่วไป',
+    avatarUrl: t.profiles?.avatar_url || null,
     isVerified: t.is_verified,
     isFeatured: t.is_featured,
     rating: t.rating_avg,
     reviewCount: t.review_count,
     experience: t.technician_applications?.experience_years || 0,
-    latitude: t.technician_applications?.latitude || t.latitude || null,
-    longitude: t.technician_applications?.longitude || t.longitude || null,
+    latitude: (t.technician_applications as any)?.latitude || t.latitude || null,
+    longitude: (t.technician_applications as any)?.longitude || t.longitude || null,
   })) : [
     {
       id: "11111111-1111-1111-1111-111111111111",
