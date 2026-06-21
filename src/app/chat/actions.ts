@@ -1,40 +1,17 @@
 'use server';
 
 import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
 
 export async function getOrCreateChatRoom(techId: string) {
   const supabase = createClient();
-  let { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    // MVP Fallback for local testing: Mock a customer user
-    const randomEmail = `customer_${Date.now()}@local.dev`;
-    const { data: signUpData } = await supabase.auth.signUp({
-      email: randomEmail,
-      password: 'password123'
-    });
-    user = signUpData?.user || null;
-  }
-
-  if (!user) {
-    return { error: 'Failed to create mock customer user' };
+    redirect('/');
   }
 
   const customerId = user.id;
-
-  // Upsert customer profile
-  await supabase.from('profiles').upsert({
-    id: customerId,
-    display_name: 'ลูกค้า (Mock)',
-    role: 'customer'
-  }, { onConflict: 'id' });
-
-  // Upsert technician profile just in case it's a mock UUID from frontend
-  await supabase.from('profiles').upsert({
-    id: techId,
-    display_name: 'ช่าง (Mock)',
-    role: 'technician'
-  }, { onConflict: 'id' });
 
   // Check if room exists
   const { data: existingRooms, error: checkError } = await supabase

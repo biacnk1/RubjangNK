@@ -9,22 +9,10 @@ export async function submitTechnicianApplication(formData: FormData) {
   const supabase = createClient();
   
   // 1. ตรวจสอบการ Login
-  let { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   
-  // สำหรับ MVP Local Test หากยังไม่ได้เชื่อมต่อ LINE เข้ากับ Supabase Auth 
-  // ให้เราจำลองสมัครสมาชิกด้วย Email ชั่วคราว เพื่อให้ได้ UUID จริงๆ ไปผ่าน RLS และ Foreign Key
   if (!user) {
-    const randomEmail = `mock_${Date.now()}@local.dev`;
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-      email: randomEmail,
-      password: 'password123'
-    });
-    
-    if (signUpError) {
-      console.error("Mock SignUp Error:", signUpError);
-      throw new Error(`ระบบไม่สามารถสร้าง Mock User ได้: ${signUpError.message}`);
-    }
-    user = signUpData.user;
+    throw new Error('กรุณาเข้าสู่ระบบผ่าน LINE ก่อนสมัครเป็นช่าง');
   }
 
   const userId = user!.id;

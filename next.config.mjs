@@ -1,13 +1,4 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: '/supabase-api/:path*',
-        destination: 'http://127.0.0.1:54321/:path*',
-      },
-    ];
-  },
-};
+const nextConfig = {};
 
 export default nextConfig;
