@@ -1,0 +1,147 @@
+.navbar {
+  background-color: var(--neutral-bg);
+  color: var(--primary);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--neutral-border);
+  position: relative; /* Set position to relative to align absolute mobileMenu dropdown */
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--primary);
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.navLink {
+  color: var(--text-primary);
+  opacity: 0.85;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.navLink:hover {
+  opacity: 1;
+  color: var(--primary);
+}
+
+.registerBtn {
+  background-color: var(--primary);
+  color: var(--neutral-bg);
+  padding: 8px 18px;
+  border-radius: var(--rounded-sm);
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.registerBtn:hover {
+  background-color: #09263a;
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   Responsive / Mobile Menu Elements
+   ========================================================================== */
+
+.menuToggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.menuToggle:hover {
+  background-color: var(--neutral-surface);
+}
+
+.mobileMenu {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .navLinks {
+    display: none; /* Hide desktop links on mobile viewports */
+  }
+
+  .menuToggle {
+    display: flex; /* Display hamburger toggle */
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobileMenu {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 16px 20px;
+    background-color: var(--neutral-bg);
+    border-top: 1px solid var(--neutral-border);
+    position: absolute;
+    top: 100%; /* Puts menu exactly below the navbar container */
+    left: 0;
+    z-index: 1000;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+    gap: 14px;
+    animation: slideDown 0.2s ease-out;
+  }
+
+  .mobileLink {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 14px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+    transition: color 0.2s;
+  }
+
+  .mobileLink:hover {
+    color: var(--primary);
+  }
+
+  .mobileRegisterBtn {
+    background-color: var(--primary);
+    color: var(--neutral-bg);
+    padding: 10px;
+    border-radius: var(--rounded-sm);
+    font-weight: 700;
+    font-size: 14px;
+    text-align: center;
+    transition: background-color 0.2s;
+    margin-top: 4px;
+  }
+
+  .mobileRegisterBtn:hover {
+    background-color: #09263a;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,72 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 48px var(--spacing-md);
+}
+
+.title {
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.formCard {
+  background-color: var(--neutral-bg);
+  border: 1px solid var(--neutral-border);
+  border-radius: var(--rounded-md);
+  padding: 32px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.formGroup {
+  margin-bottom: 24px;
+}
+
+.formGroup label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.col {
+  flex: 1;
+}
+
+.col .formGroup {
+  margin-bottom: 0;
+}
+
+.submitBtn {
+  width: 100%;
+  background-color: var(--primary);
+  color: var(--neutral-bg);
+  padding: 14px;
+  border-radius: var(--rounded-sm);
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+.submitBtn:hover {
+  background-color: #09263a;
+}
