@@ -8,6 +8,7 @@ interface LiffContextType {
   liff: Liff | null;
   liffError: string | null;
   isLoggedIn: boolean;
+  isReady: boolean;
   profile: any | null;
 }
 
@@ -15,6 +16,7 @@ const LiffContext = createContext<LiffContextType>({
   liff: null,
   liffError: null,
   isLoggedIn: false,
+  isReady: false,
   profile: null,
 });
 
@@ -22,6 +24,7 @@ export function LiffProvider({ children }: { children: React.ReactNode }) {
   const [liff, setLiff] = useState<Liff | null>(null);
   const [liffError, setLiffError] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
@@ -47,7 +50,7 @@ export function LiffProvider({ children }: { children: React.ReactNode }) {
               // Sync with Supabase Auth
               const supabase = createClient();
               const email = `${userProfile.userId}@line.liff`;
-              const { data, error } = await supabase.auth.signInWithPassword({
+              const { error } = await supabase.auth.signInWithPassword({
                 email,
                 password: userProfile.userId
               });
@@ -63,16 +66,18 @@ export function LiffProvider({ children }: { children: React.ReactNode }) {
               console.error('Failed to get LIFF profile or login to Supabase', err);
             }
           }
+          setIsReady(true);
         })
         .catch((err: Error) => {
           setLiffError(err.toString());
+          setIsReady(true); // ready แม้ error เพื่อไม่ให้ค้าง
           console.error('LIFF init failed', err);
         });
     });
   }, []);
 
   return (
-    <LiffContext.Provider value={{ liff, liffError, isLoggedIn, profile }}>
+    <LiffContext.Provider value={{ liff, liffError, isLoggedIn, isReady, profile }}>
       {children}
     </LiffContext.Provider>
   );

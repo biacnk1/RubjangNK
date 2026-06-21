@@ -5,21 +5,20 @@ import { useLiff } from '@/components/LiffProvider';
 import styles from './page.module.css';
 
 export default function RegisterForm({ categories, submitAction }: { categories: any[], submitAction: any }) {
-  const { liff, isLoggedIn, profile } = useLiff();
+  const { liff, isLoggedIn, isReady, profile } = useLiff();
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
   const [locating, setLocating] = useState(false);
 
   useEffect(() => {
-    // Skip LIFF login on localhost for local testing
+    if (!isReady) return; // รอ LIFF init ก่อน
     const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
     if (isLocal) return;
 
     if (liff && !isLoggedIn) {
-      // Force LIFF login on the registration page
       liff.login({ redirectUri: window.location.href });
     }
-  }, [liff, isLoggedIn]);
+  }, [liff, isLoggedIn, isReady]);
 
   const getLocation = () => {
     if (!navigator.geolocation) {
@@ -41,7 +40,14 @@ export default function RegisterForm({ categories, submitAction }: { categories:
   };
 
   const isLocalEnv = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-  if (!isLoggedIn && !isLocalEnv) {
+
+  // รอ LIFF init ก่อน
+  if (!isReady && !isLocalEnv) {
+    return <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>กำลังโหลด LINE...</div>;
+  }
+
+  // LIFF ready แล้ว แต่ยังไม่ login → liff.login() จะ redirect ไปเอง
+  if (isReady && !isLoggedIn && !isLocalEnv) {
     return <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>กำลังเข้าสู่ระบบผ่าน LINE...</div>;
   }
 
