@@ -1,6 +1,5 @@
 -- =============================================================================
--- RubjangNK - Main Database Schema
--- รวม migration ทั้งหมด สำหรับ run บน Supabase Cloud Dashboard
+-- RubjangNK - Main Database Schema (Idempotent - run ซ้ำได้ปลอดภัย)
 -- วันที่: 2026-06-21
 -- =============================================================================
 
@@ -8,18 +7,25 @@
 CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA extensions;
 
 -- =============================================================================
--- ENUMS
+-- ENUMS (ใช้ DO block เพราะ PostgreSQL ไม่มี CREATE TYPE IF NOT EXISTS)
 -- =============================================================================
 
-CREATE TYPE public.user_role AS ENUM ('customer', 'technician', 'admin');
-CREATE TYPE public.application_status AS ENUM ('pending', 'approved', 'rejected');
+DO $$ BEGIN
+  CREATE TYPE public.user_role AS ENUM ('customer', 'technician', 'admin');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE public.application_status AS ENUM ('pending', 'approved', 'rejected');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- =============================================================================
 -- TABLES
 -- =============================================================================
 
 -- 1. profiles (เชื่อมกับ Supabase auth.users)
-CREATE TABLE public.profiles (
+CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
   line_user_id TEXT UNIQUE,
   display_name TEXT NOT NULL,
@@ -29,7 +35,7 @@ CREATE TABLE public.profiles (
 );
 
 -- 2. service_categories
-CREATE TABLE public.service_categories (
+CREATE TABLE IF NOT EXISTS public.service_categories (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name_th TEXT NOT NULL,
   icon_url TEXT,
@@ -37,7 +43,7 @@ CREATE TABLE public.service_categories (
 );
 
 -- 3. technician_applications
-CREATE TABLE public.technician_applications (
+CREATE TABLE IF NOT EXISTS public.technician_applications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   full_name TEXT NOT NULL,
@@ -47,28 +53,32 @@ CREATE TABLE public.technician_applications (
   experience_years INTEGER,
   portfolio_urls TEXT[],
   status public.application_status DEFAULT 'pending'::public.application_status,
-  latitude FLOAT8,
-  longitude FLOAT8,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 4. technician_profiles (สำหรับช่างที่ approved แล้ว)
-CREATE TABLE public.technician_profiles (
+-- เพิ่ม columns lat/lng ถ้ายังไม่มี
+ALTER TABLE public.technician_applications ADD COLUMN IF NOT EXISTS latitude FLOAT8;
+ALTER TABLE public.technician_applications ADD COLUMN IF NOT EXISTS longitude FLOAT8;
+
+-- 4. technician_profiles
+CREATE TABLE IF NOT EXISTS public.technician_profiles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL UNIQUE,
   application_id UUID REFERENCES public.technician_applications(id) ON DELETE RESTRICT,
   is_verified BOOLEAN DEFAULT false,
   is_featured BOOLEAN DEFAULT false,
-  is_listed BOOLEAN DEFAULT true,
   rating_avg NUMERIC(3,2) DEFAULT 0.00,
   review_count INTEGER DEFAULT 0,
-  latitude FLOAT8,
-  longitude FLOAT8,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- เพิ่ม columns ถ้ายังไม่มี
+ALTER TABLE public.technician_profiles ADD COLUMN IF NOT EXISTS is_listed BOOLEAN DEFAULT true;
+ALTER TABLE public.technician_profiles ADD COLUMN IF NOT EXISTS latitude FLOAT8;
+ALTER TABLE public.technician_profiles ADD COLUMN IF NOT EXISTS longitude FLOAT8;
+
 -- 5. technician_private_info (ข้อมูลส่วนตัว - เข้าถึงได้แค่ service_role)
-CREATE TABLE public.technician_private_info (
+CREATE TABLE IF NOT EXISTS public.technician_private_info (
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE PRIMARY KEY,
   phone_number TEXT NOT NULL,
   national_id TEXT,
@@ -77,7 +87,7 @@ CREATE TABLE public.technician_private_info (
 );
 
 -- 6. chat_rooms
-CREATE TABLE public.chat_rooms (
+CREATE TABLE IF NOT EXISTS public.chat_rooms (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   customer_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   technician_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
@@ -88,7 +98,7 @@ CREATE TABLE public.chat_rooms (
 );
 
 -- 7. chat_messages
-CREATE TABLE public.chat_messages (
+CREATE TABLE IF NOT EXISTS public.chat_messages (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   room_id UUID REFERENCES public.chat_rooms(id) ON DELETE CASCADE NOT NULL,
   sender_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL NOT NULL,
@@ -98,7 +108,7 @@ CREATE TABLE public.chat_messages (
 );
 
 -- 8. job_deals
-CREATE TABLE public.job_deals (
+CREATE TABLE IF NOT EXISTS public.job_deals (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   room_id UUID REFERENCES public.chat_rooms(id) ON DELETE CASCADE NOT NULL,
   amount NUMERIC(10, 2) NOT NULL,
@@ -121,47 +131,62 @@ ALTER TABLE public.chat_rooms ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.chat_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.job_deals ENABLE ROW LEVEL SECURITY;
 
+-- =============================================================================
+-- POLICIES (DROP ก่อนแล้วสร้างใหม่ เพื่อให้ run ซ้ำได้)
+-- =============================================================================
+
 -- --- profiles ---
+DROP POLICY IF EXISTS "Public profiles are viewable by everyone." ON public.profiles;
 CREATE POLICY "Public profiles are viewable by everyone."
   ON public.profiles FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Users can insert their own profile." ON public.profiles;
 CREATE POLICY "Users can insert their own profile."
   ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can update own profile." ON public.profiles;
 CREATE POLICY "Users can update own profile."
   ON public.profiles FOR UPDATE USING (auth.uid() = id);
 
 -- --- service_categories ---
+DROP POLICY IF EXISTS "Service categories are viewable by everyone." ON public.service_categories;
 CREATE POLICY "Service categories are viewable by everyone."
   ON public.service_categories FOR SELECT USING (true);
 
 -- --- technician_applications ---
+DROP POLICY IF EXISTS "Users can view their own applications." ON public.technician_applications;
 CREATE POLICY "Users can view their own applications."
   ON public.technician_applications FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own application." ON public.technician_applications;
 CREATE POLICY "Users can insert their own application."
   ON public.technician_applications FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own application." ON public.technician_applications;
 CREATE POLICY "Users can update their own application."
   ON public.technician_applications FOR UPDATE USING (auth.uid() = user_id);
 
 -- --- technician_profiles ---
+DROP POLICY IF EXISTS "Technician profiles are viewable by everyone." ON public.technician_profiles;
 CREATE POLICY "Technician profiles are viewable by everyone."
   ON public.technician_profiles FOR SELECT USING (true);
 
 -- --- technician_private_info ---
--- ไม่สร้าง policy → เข้าถึงได้แค่ service_role เท่านั้น (admin client)
+-- ไม่มี policy → เข้าถึงได้แค่ service_role admin client เท่านั้น
 
 -- --- chat_rooms ---
+DROP POLICY IF EXISTS "Users can view their own chat rooms" ON public.chat_rooms;
 CREATE POLICY "Users can view their own chat rooms"
   ON public.chat_rooms FOR SELECT
   USING (auth.uid() = customer_id OR auth.uid() = technician_id);
 
+DROP POLICY IF EXISTS "Users can create chat rooms" ON public.chat_rooms;
 CREATE POLICY "Users can create chat rooms"
   ON public.chat_rooms FOR INSERT
   WITH CHECK (auth.uid() = customer_id OR auth.uid() = technician_id);
 
 -- --- chat_messages ---
+DROP POLICY IF EXISTS "Users can view messages in their rooms" ON public.chat_messages;
 CREATE POLICY "Users can view messages in their rooms"
   ON public.chat_messages FOR SELECT
   USING (
@@ -171,6 +196,7 @@ CREATE POLICY "Users can view messages in their rooms"
     )
   );
 
+DROP POLICY IF EXISTS "Users can insert messages in their rooms" ON public.chat_messages;
 CREATE POLICY "Users can insert messages in their rooms"
   ON public.chat_messages FOR INSERT
   WITH CHECK (
@@ -182,6 +208,7 @@ CREATE POLICY "Users can insert messages in their rooms"
   );
 
 -- --- job_deals ---
+DROP POLICY IF EXISTS "Users can view deals in their rooms" ON public.job_deals;
 CREATE POLICY "Users can view deals in their rooms"
   ON public.job_deals FOR SELECT
   USING (
@@ -191,6 +218,7 @@ CREATE POLICY "Users can view deals in their rooms"
     )
   );
 
+DROP POLICY IF EXISTS "Technicians can create deals" ON public.job_deals;
 CREATE POLICY "Technicians can create deals"
   ON public.job_deals FOR INSERT
   WITH CHECK (
@@ -200,6 +228,7 @@ CREATE POLICY "Technicians can create deals"
     )
   );
 
+DROP POLICY IF EXISTS "Customers can update deal status" ON public.job_deals;
 CREATE POLICY "Customers can update deal status"
   ON public.job_deals FOR UPDATE
   USING (
