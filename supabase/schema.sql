@@ -7,18 +7,22 @@
 CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA extensions;
 
 -- =============================================================================
--- ENUMS (ใช้ DO block เพราะ PostgreSQL ไม่มี CREATE TYPE IF NOT EXISTS)
+-- ENUMS (ตรวจสอบจาก pg_type ก่อนสร้าง)
 -- =============================================================================
 
-DO $$ BEGIN
-  CREATE TYPE public.user_role AS ENUM ('customer', 'technician', 'admin');
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+                 WHERE t.typname = 'user_role' AND n.nspname = 'public') THEN
+    CREATE TYPE public.user_role AS ENUM ('customer', 'technician', 'admin');
+  END IF;
 
-DO $$ BEGIN
-  CREATE TYPE public.application_status AS ENUM ('pending', 'approved', 'rejected');
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
+  IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+                 WHERE t.typname = 'application_status' AND n.nspname = 'public') THEN
+    CREATE TYPE public.application_status AS ENUM ('pending', 'approved', 'rejected');
+  END IF;
+END
+$$;
 
 -- =============================================================================
 -- TABLES
