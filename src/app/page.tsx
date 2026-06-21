@@ -45,20 +45,20 @@ export default async function Home() {
   let dbTechnicians = null;
   
   try {
-    // Fetch categories
-    const { data: catData } = await supabase.from('service_categories').select('*');
-    dbCategories = catData;
-    
-    // Fetch featured/verified technicians
-    const { data: techData } = await supabase
-      .from('technician_profiles')
-      .select(`
-        *,
-        technician_applications!inner(full_name, category_id, experience_years),
-        profiles!inner(display_name)
-      `)
-      .limit(8);
-    dbTechnicians = techData;
+    // Fetch categories and featured/verified technicians in parallel
+    const [catRes, techRes] = await Promise.all([
+      supabase.from('service_categories').select('*'),
+      supabase.from('technician_profiles')
+        .select(`
+          *,
+          technician_applications!inner(full_name, category_id, experience_years),
+          profiles!inner(display_name)
+        `)
+        .limit(8)
+    ]);
+
+    dbCategories = catRes.data;
+    dbTechnicians = techRes.data;
   } catch (error) {
     console.warn("Supabase connection failed. Falling back to mock data.");
   }

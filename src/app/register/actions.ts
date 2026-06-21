@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
@@ -48,6 +49,20 @@ export async function submitTechnicianApplication(formData: FormData) {
   }, { onConflict: 'id' });
   
   if (profileError) console.error("Profile upsert error:", profileError);
+
+  // 2.5 Save sensitive/private information using Admin client (with service_role)
+  const adminSupabase = createAdminClient();
+  const { error: privateInfoError } = await adminSupabase
+    .from('technician_private_info')
+    .upsert({
+      user_id: userId,
+      phone_number: phone,
+    });
+
+  if (privateInfoError) {
+    console.error("Private Info Insert Error:", privateInfoError.message);
+    throw new Error(`ไม่สามารถบันทึกข้อมูลส่วนตัวของช่างได้: ${privateInfoError.message}`);
+  }
 
   // 3. บันทึกลงฐานข้อมูล
   const { data: appData, error } = await supabase

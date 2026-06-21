@@ -30,7 +30,7 @@ CREATE TABLE public.technician_applications (
   full_name TEXT NOT NULL,
   phone_number TEXT NOT NULL,
   category_id UUID REFERENCES public.service_categories(id) ON DELETE RESTRICT NOT NULL,
-  location geography(Point, 4326),
+  location extensions.geography(Point, 4326),
   experience_years INTEGER,
   portfolio_urls TEXT[],
   status public.application_status DEFAULT 'pending'::public.application_status,
