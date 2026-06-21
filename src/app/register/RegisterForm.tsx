@@ -5,7 +5,7 @@ import { useLiff } from '@/components/LiffProvider';
 import styles from './page.module.css';
 
 export default function RegisterForm({ categories, submitAction }: { categories: any[], submitAction: any }) {
-  const { liff, isLoggedIn, isReady, profile } = useLiff();
+  const { liff, liffError, isLoggedIn, isReady, profile } = useLiff();
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
   const [locating, setLocating] = useState(false);
@@ -43,12 +43,17 @@ export default function RegisterForm({ categories, submitAction }: { categories:
 
   // รอ LIFF init ก่อน
   if (!isReady && !isLocalEnv) {
-    return <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>กำลังโหลด LINE...</div>;
+    return <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>กำลังโหลด LINE...<br/><small style={{fontSize:'11px', color:'#aaa'}}>isReady: false</small></div>;
+  }
+
+  // LIFF init error
+  if (liffError) {
+    return <div style={{ textAlign: 'center', padding: '40px', color: '#d32f2f' }}>LIFF Error: {liffError}</div>;
   }
 
   // LIFF ready แล้ว แต่ยังไม่ login → liff.login() จะ redirect ไปเอง
   if (isReady && !isLoggedIn && !isLocalEnv) {
-    return <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>กำลังเข้าสู่ระบบผ่าน LINE...</div>;
+    return <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>กำลังเข้าสู่ระบบผ่าน LINE...<br/><small style={{fontSize:'11px', color:'#aaa'}}>isReady: true | liff: {liff ? 'ok' : 'null'}</small></div>;
   }
 
   return (
