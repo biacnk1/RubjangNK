@@ -75,14 +75,16 @@ export async function submitTechnicianApplication(formData: FormData) {
   }
 
   // Auto-create profile for MVP so it shows up on homepage immediately
+  // ใช้ adminSupabase เพราะ technician_profiles ไม่มี INSERT policy (RLS)
   if (appData) {
-    await supabase.from('technician_profiles').insert({
+    const { error: profileInsertError } = await adminSupabase.from('technician_profiles').insert({
       user_id: userId,
       application_id: appData.id,
       is_verified: true,
       rating_avg: 5.0,
       review_count: 0
     });
+    if (profileInsertError) console.error("Technician profile insert error:", profileInsertError.message);
   }
 
   revalidatePath('/');
