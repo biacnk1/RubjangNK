@@ -22,6 +22,7 @@ function deg2rad(deg: number): number {
 
 interface Technician {
   id: string;
+  userId: string;
   name: string;
   category: string;
   avatarUrl?: string | null;

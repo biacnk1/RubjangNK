@@ -6,6 +6,7 @@ import styles from './TechnicianCard.module.css';
 
 interface TechnicianCardProps {
   id: string;
+  userId: string;
   name: string;
   category: string;
   avatarUrl?: string | null;
@@ -20,6 +21,7 @@ interface TechnicianCardProps {
 
 export default function TechnicianCard({
   id,
+  userId,
   name,
   category,
   avatarUrl,
@@ -39,7 +41,7 @@ export default function TechnicianCard({
 
     if (isLocal) {
       // Local dev: skip LIFF, go directly
-      router.push('/chat/new/' + id);
+      router.push('/chat/new/' + userId);
       return;
     }
 
@@ -47,11 +49,11 @@ export default function TechnicianCard({
       alert('กำลังเชื่อมต่อระบบ กรุณารอสักครู่');
       return;
     }
-    
+
     if (!isLoggedIn) {
-      liff.login({ redirectUri: window.location.origin + '/chat/new/' + id });
+      liff.login({ redirectUri: window.location.origin + '/chat/new/' + userId });
     } else {
-      router.push('/chat/new/' + id);
+      router.push('/chat/new/' + userId);
     }
   };
 
