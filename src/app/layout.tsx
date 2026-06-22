@@ -29,9 +29,6 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://rubjangnk.netlify.app",
   },
-  verification: {
-    google: "icVY5R2IgYzi0ROcLohRFssC7SOTcggErsqBzx7oO3s",
-  },
 };
 
 export const viewport: Viewport = {

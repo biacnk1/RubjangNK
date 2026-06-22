@@ -32,6 +32,7 @@ Implement full Search Engine Optimization (SEO) and Answer Engine Optimization (
 
 ### E. Social Card Asset & Git Configuration
 - **`public/og-default.png`**: Generated a dark-themed OpenGraph social image.
+- **`public/googlebe0f88ae3cfe5c2e.html`**: Added Google Search Console HTML verification file (uncommitted).
 - **`.gitignore`**: Added an exception `!public/**/*.png` under `*.png` rules to ensure `og-default.png` and other public UI assets are tracked by Git.
 
 ---
@@ -44,6 +45,6 @@ Implement full Search Engine Optimization (SEO) and Answer Engine Optimization (
 ---
 
 ## 4. Next Steps for Next Assistant / Session
-1. **Trigger Netlify Build:** Ensure the push has successfully finished compiling on Netlify.
-2. **Verify Google Search Console:** Go to Search Console and complete site verification for `https://rubjangnk.netlify.app`.
+1. **Commit and Push Verification File:** Commit the newly created `public/googlebe0f88ae3cfe5c2e.html` and push the changes.
+2. **Verify Google Search Console:** Once the deployment compiles, verify your site ownership using the recommended **HTML file** method.
 3. **Submit Sitemap:** Submit `https://rubjangnk.netlify.app/sitemap.xml` within the Search Console dashboard.
