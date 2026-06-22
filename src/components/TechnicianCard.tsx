@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useLiff } from '@/components/LiffProvider';
 import { useRouter } from 'next/navigation';
 import styles from './TechnicianCard.module.css';
@@ -107,7 +108,7 @@ export default function TechnicianCard({
       </div>
       <div className={styles.imagePlaceholder}>
         {avatarUrl ? (
-          <img src={avatarUrl} alt={name} className={styles.avatarImage} />
+          <Image src={avatarUrl} alt={name} fill sizes="100px" className={styles.avatarImage} />
         ) : (
           <div className={styles.avatarPlaceholder}>รูปช่าง</div>
         )}

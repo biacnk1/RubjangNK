@@ -29,34 +29,6 @@
   margin-bottom: 32px;
 }
 
-.searchBox {
-  max-width: 600px;
-  margin: 0 auto;
-  position: relative;
-}
-
-.searchInput {
-  width: 100%;
-  padding: 16px 24px;
-  padding-right: 50px;
-  font-size: 16px;
-  border-radius: 30px;
-  border: 1px solid #ced4da;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-.searchIconBtn {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-}
-
-
 
 .section {
   padding: 48px 0;
@@ -78,52 +50,3 @@
   font-weight: 700;
 }
 
-.categoryGrid {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.categoryCard {
-  background-color: var(--neutral-bg);
-  border: 1px solid var(--neutral-border);
-  border-radius: 16px;
-  padding: 24px 16px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  width: 140px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-}
-
-.categoryCard:hover {
-  border-color: var(--primary);
-  transform: translateY(-2px);
-}
-
-.categoryIcon {
-  font-size: 32px;
-  margin-bottom: 8px;
-}
-
-.iconContainer {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 12px auto;
-  transition: all 0.2s ease;
-}
-
-.categoryCard:hover .iconContainer {
-  transform: scale(1.08);
-}
-
-.technicianGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
-}

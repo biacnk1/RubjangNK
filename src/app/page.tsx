@@ -4,50 +4,13 @@ import DistanceSearchList from "@/components/DistanceSearchList";
 
 export const dynamic = 'force-dynamic';
 
-function getCategoryIcon(name: string) {
-  const normalized = name.toLowerCase();
-  
-  let src = "";
-  
-  if (normalized.includes('แอร์')) {
-    src = "/images/ac.png";
-  } else if (normalized.includes('ประปา')) {
-    src = "/images/plumber.png";
-  } else if (normalized.includes('ไฟฟ้า')) {
-    src = "/images/electrician.png";
-  } else if (normalized.includes('ซ่อมบำรุง') || normalized.includes('ก่อสร้าง') || normalized.includes('ต่อเติม')) {
-    src = "/images/maintenance.png";
-  } else if (normalized.includes('แม่บ้าน') || normalized.includes('สะอาด') || normalized.includes('กวาด')) {
-    src = "/images/cleaner.png";
-  }
-  
-  if (src) {
-    return (
-      <div className={styles.iconContainer} style={{ backgroundColor: 'transparent' }}>
-        <img src={src} alt={name} style={{ width: '56px', height: '56px', objectFit: 'contain' }} />
-      </div>
-    );
-  }
-  
-  return (
-    <div className={styles.iconContainer} style={{ backgroundColor: '#f5f5f5', color: '#757575' }}>
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <line x1="12" y1="8" x2="12" y2="12" />
-        <line x1="12" y1="16" x2="12.01" y2="16" />
-      </svg>
-    </div>
-  );
-}
-
 export default async function Home() {
   const supabase = createClient();
-  
+
   let dbCategories = null;
   let dbTechnicians = null;
-  
+
   try {
-    // Fetch categories and featured/verified technicians in parallel
     const [catRes, techRes] = await Promise.all([
       supabase.from('service_categories').select('*'),
       supabase.from('technician_profiles')
@@ -71,16 +34,16 @@ export default async function Home() {
   } catch (error) {
     console.warn("Supabase connection failed. Falling back to mock data.");
   }
-  // Fallback to mock data for UI demo if DB is empty
+
   const categories = dbCategories && dbCategories.length > 0 ? dbCategories.map(c => ({
-    id: c.id, name: c.name_th, icon: c.icon_url || "📌"
+    id: c.id, name: c.name_th
   })) : [
-    { id: "1", name: "ช่างแอร์", icon: "❄️" },
-    { id: "2", name: "ช่างประปา", icon: "🚰" },
-    { id: "3", name: "ช่างไฟฟ้า", icon: "⚡" },
-    { id: "4", name: "แม่บ้าน", icon: "🧹" },
-    { id: "5", name: "ช่างซ่อมบำรุง", icon: "🛠️" },
-    { id: "6", name: "ช่างก่อสร้าง", icon: "🧱" },
+    { id: "1", name: "ช่างแอร์" },
+    { id: "2", name: "ช่างประปา" },
+    { id: "3", name: "ช่างไฟฟ้า" },
+    { id: "4", name: "แม่บ้าน" },
+    { id: "5", name: "ช่างซ่อมบำรุง" },
+    { id: "6", name: "ช่างก่อสร้าง" },
   ];
 
   const technicians = dbTechnicians && dbTechnicians.length > 0 ? dbTechnicians.map((t: any) => {
@@ -162,41 +125,12 @@ export default async function Home() {
           <h1 className={styles.heroTitle}>หาช่าง - แม่บ้าน ใกล้บ้านคุณในหนองคาย</h1>
           <p className={styles.heroSubtitle}>บริการคุณภาพ เชื่อถือได้ ค้นหาง่าย ครบจบในที่เดียว</p>
           <p className={styles.heroHighlight}>ฟรีไม่มีค่าคอม • ช่าง Verified</p>
-          <div className={styles.searchBox}>
-            <input type="text" placeholder="ค้นหาช่าง, แม่บ้าน หรือบริการที่ต้องการ (เช่น ซ่อมแอร์, ทำความสะอาด...)" className={styles.searchInput} />
-            <button className={styles.searchIconBtn}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            </button>
-          </div>
         </div>
       </section>
 
       <section className={styles.section}>
         <div className="container">
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>หมวดหมู่บริการ</h2>
-          </div>
-          <div className={styles.categoryGrid}>
-            {categories.map((cat: any) => (
-              <div key={cat.id} className={styles.categoryCard}>
-                {cat.icon && (cat.icon.startsWith('http') || cat.icon.startsWith('/')) ? (
-                  <img src={cat.icon} alt={cat.name} style={{ width: '40px', height: '40px', objectFit: 'contain', marginBottom: '12px' }} />
-                ) : (
-                  getCategoryIcon(cat.name)
-                )}
-                <div className="text-label">{cat.name}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className={`${styles.section} bg-neutral`}>
-        <div className="container">
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>ช่างและแม่บ้านแนะนำในหนองคาย</h2>
-          </div>
-          <DistanceSearchList initialTechnicians={technicians} />
+          <DistanceSearchList initialTechnicians={technicians} categories={categories} />
         </div>
       </section>
     </div>
