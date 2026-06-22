@@ -27,11 +27,7 @@ export default function Navbar() {
 
         {/* Desktop Navigation Links */}
         <div className={styles.navLinks}>
-          <Link href="/" className={styles.navLink}>ค้นหาช่าง</Link>
-          <Link href="/about" className={styles.navLink}>เกี่ยวกับเรา</Link>
-          <Link href="/register" className={styles.navLink}>สมัครเป็นช่าง</Link>
-          <Link href="/login" className={styles.navLink}>เข้าสู่ระบบ</Link>
-          <Link href="/register" className={styles.registerBtn}>สมัครสมาชิก</Link>
+          <Link href="/register" className={styles.registerBtn}>สมัครเป็นช่าง</Link>
         </div>
 
         {/* Hamburger Toggle Button for Mobile */}
@@ -59,11 +55,7 @@ export default function Navbar() {
       {/* Mobile Drawer Dropdown Menu */}
       {isOpen && (
         <div className={styles.mobileMenu}>
-          <Link href="/" className={styles.mobileLink} onClick={closeMenu}>ค้นหาช่าง</Link>
-          <Link href="/about" className={styles.mobileLink} onClick={closeMenu}>เกี่ยวกับเรา</Link>
-          <Link href="/register" className={styles.mobileLink} onClick={closeMenu}>สมัครเป็นช่าง</Link>
-          <Link href="/login" className={styles.mobileLink} onClick={closeMenu}>เข้าสู่ระบบ</Link>
-          <Link href="/register" className={styles.mobileRegisterBtn} onClick={closeMenu}>สมัครสมาชิก</Link>
+          <Link href="/register" className={styles.mobileRegisterBtn} onClick={closeMenu}>สมัครเป็นช่าง</Link>
         </div>
       )}
     </nav>
