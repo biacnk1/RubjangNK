@@ -37,6 +37,10 @@
 - ดึงจาก LINE เป็น default, กดเปลี่ยน/อัพโหลดเองได้
 - Upload ผ่าน Supabase Storage (`avatars` bucket)
 
+### 1.6 ~~Navbar เหลือเฉพาะ CTA~~ ✅
+- ลบลิงก์ที่ไม่มีหน้าจริง (/about, /login) และปุ่มซ้ำ (สมัครสมาชิก)
+- เหลือ "สมัครเป็นช่าง" อันเดียว (auth เป็น LINE LIFF อัตโนมัติ)
+
 ---
 
 ## Part 2 — UI / UX Polish 🎨
@@ -64,13 +68,18 @@
 
 ระบบแชทพื้นฐานมีแล้ว แต่ต้องทำให้ใช้งานได้จริง
 
-### 3.1 Chat notification / unread count 🔲
+### 3.1 ~~แก้บั๊ก technician_id ผิดในแชต~~ ✅
+- chat_rooms.technician_id ต้องเป็น auth uid (profiles.id) ไม่ใช่ technician_profiles.id (PK)
+- เพิ่ม userId field ตลอด pipeline: page.tsx → DistanceSearchList → TechnicianCard
+- ช่างเห็นห้องแชตจริง + ชื่อคู่สนทนาถูกต้อง
+
+### 3.2 Chat notification / unread count 🔲
 - แสดงจำนวนข้อความที่ยังไม่อ่านบน Navbar
 
-### 3.2 Realtime subscription 🔲
+### 3.3 Realtime subscription 🔲
 - ตรวจสอบว่า Supabase Realtime ทำงานบน cloud instance
 
-### 3.3 Chat UX improvements 🔲
+### 3.4 Chat UX improvements 🔲
 - แสดงเวลาส่ง, scroll to bottom อัตโนมัติ
 
 ---
@@ -117,8 +126,10 @@
 
 ## Part 7 — LINE OA Integration 📱
 
-### 7.1 Push notification ผ่าน LINE OA 🔲
-- แจ้งช่างเมื่อมีลูกค้าติดต่อ / แจ้งลูกค้าเมื่อช่างตอบ
+### 7.1 ~~Push notification ผ่าน LINE OA~~ ✅ (โค้ดเสร็จ, รอ ops setup)
+- Edge Function `notify-new-message` + debounce 5 นาที
+- เก็บ `line_user_id` ลง profiles ตอนสมัคร
+- **รอ ops:** ตั้ง secrets (LINE_CHANNEL_ACCESS_TOKEN, LIFF_ID, WEBHOOK_SECRET), wire DB webhook, ช่างต้องแอด OA เป็นเพื่อน
 
 ### 7.2 Rich Menu 🔲
 - เพิ่ม Rich Menu สำหรับ navigation หลัก
@@ -128,17 +139,21 @@
 ## ลำดับความสำคัญ (Priority Order)
 
 ```
-Part 1 (Security)        ✅ เสร็จแล้ว
+Part 1 (Security)        ✅ เสร็จแล้ว (รวม navbar cleanup)
+  ↓
+Part 3 (Chat ID fix)     ✅ เสร็จแล้ว (ช่างเห็นแชตจริง)
+  ↓
+Part 7.1 (LINE Push)     ✅ โค้ดเสร็จ — รอ ops setup (OA + secrets + webhook)
   ↓
 Part 2 (UI Polish)       ← ทำให้หน้าตาดีก่อนเปิดให้คนใช้
   ↓
 Part 6 (Profile Page)    ← ต้องมีก่อน Review
   ↓
-Part 3 (Chat)            ← ทำให้ใช้งานจริงได้
+Part 3 (Chat UX)         ← unread count, realtime check, UX
   ↓
 Part 5 (Reviews)         ← สร้างความน่าเชื่อถือ
   ↓
 Part 4 (ID Verification) ← self-service, ไม่มี admin route
   ↓
-Part 7 (LINE OA)         ← เพิ่ม engagement
+Part 7.2 (Rich Menu)     ← เพิ่ม engagement
 ```
