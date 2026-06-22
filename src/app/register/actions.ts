@@ -29,8 +29,43 @@ export async function submitTechnicianApplication(formData: FormData) {
   const latitude = parseFloat(latStr);
   const longitude = parseFloat(lngStr);
 
+  const startingRateStr = formData.get('startingRate') as string | null;
+  const startingRate = startingRateStr ? parseInt(startingRateStr) : null;
+
+  const adminSupabase = createAdminClient();
+
+  // Handle avatar: uploaded file takes priority over LINE URL
+  const avatarFile = formData.get('avatarFile') as File | null;
+  let avatarUrl: string | null = null;
+
+  if (avatarFile && avatarFile.size > 0) {
+    const ext = avatarFile.name.split('.').pop() || 'jpg';
+    const path = `${userId}/avatar.${ext}`;
+    const { error: uploadError } = await adminSupabase.storage
+      .from('avatars')
+      .upload(path, avatarFile, { upsert: true, contentType: avatarFile.type });
+    if (!uploadError) {
+      const { data: publicUrl } = adminSupabase.storage
+        .from('avatars')
+        .getPublicUrl(path);
+      avatarUrl = publicUrl.publicUrl;
+    }
+  }
+
+  // Fallback to LINE avatar if no file uploaded
+  if (!avatarUrl) {
+    const rawAvatarUrl = formData.get('avatarUrl') as string | null;
+    if (rawAvatarUrl) {
+      try {
+        const parsed = new URL(rawAvatarUrl);
+        if (['profile.line-scdn.net', 'sprofile.line-scdn.net'].includes(parsed.hostname)) {
+          avatarUrl = rawAvatarUrl;
+        }
+      } catch {}
+    }
+  }
+
   // Ensure profile exists to satisfy foreign key
-  const avatarUrl = formData.get('avatarUrl') as string | null;
   const { error: profileError } = await supabase.from('profiles').upsert({
     id: userId,
     display_name: fullName,
@@ -41,7 +76,6 @@ export async function submitTechnicianApplication(formData: FormData) {
   if (profileError) console.error("Profile upsert error:", profileError);
 
   // 2.5 Save sensitive/private information using Admin client (with service_role)
-  const adminSupabase = createAdminClient();
   const { error: privateInfoError } = await adminSupabase
     .from('technician_private_info')
     .upsert({
@@ -66,6 +100,7 @@ export async function submitTechnicianApplication(formData: FormData) {
       portfolio_urls: portfolio ? [portfolio] : [],
       latitude: isNaN(latitude) ? null : latitude,
       longitude: isNaN(longitude) ? null : longitude,
+      starting_rate: startingRate,
       status: 'approved' // Auto-approve for MVP
     })
     .select('id')
@@ -83,7 +118,7 @@ export async function submitTechnicianApplication(formData: FormData) {
       user_id: userId,
       application_id: appData.id,
       is_verified: false,
-      rating_avg: 5.0,
+      rating_avg: null,
       review_count: 0
     });
     if (profileInsertError) console.error("Technician profile insert error:", profileInsertError.message);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLiff } from '@/components/LiffProvider';
 import styles from './page.module.css';
 
@@ -9,6 +9,21 @@ export default function RegisterForm({ categories, submitAction }: { categories:
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
   const [locating, setLocating] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (profile?.pictureUrl && !avatarPreview) {
+      setAvatarPreview(profile.pictureUrl);
+    }
+  }, [profile?.pictureUrl]);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setAvatarPreview(url);
+  };
 
   useEffect(() => {
     if (!isReady) return; // รอ LIFF init ก่อน
@@ -59,19 +74,37 @@ export default function RegisterForm({ categories, submitAction }: { categories:
   return (
     <div className={styles.formCard}>
       <form action={submitAction}>
-        {/* Profile Picture Preview */}
+        {/* Profile Picture — editable */}
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          {profile?.pictureUrl ? (
-            <img 
-              src={profile.pictureUrl} 
-              alt="Profile" 
-              style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #e0e0e0' }} 
-            />
-          ) : (
-            <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#eee', margin: '0 auto' }} />
-          )}
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            style={{ cursor: 'pointer', position: 'relative', width: '80px', height: '80px', margin: '0 auto' }}
+          >
+            {avatarPreview ? (
+              <img
+                src={avatarPreview}
+                alt="Profile"
+                style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #e0e0e0' }}
+              />
+            ) : (
+              <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999', fontSize: '12px' }}>
+                เลือกรูป
+              </div>
+            )}
+            <div style={{ position: 'absolute', bottom: '-2px', right: '-2px', background: '#0c324e', color: '#fff', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', border: '2px solid #fff' }}>
+              ✎
+            </div>
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            name="avatarFile"
+            accept="image/*"
+            onChange={handleAvatarChange}
+            style={{ display: 'none' }}
+          />
           <p style={{ fontSize: '13px', color: '#666', marginTop: '8px' }}>
-            รูปโปรไฟล์เริ่มต้นดึงจาก LINE<br/>(สามารถเข้ามาเปลี่ยนรูปที่ดูเป็นมืออาชีพได้ภายหลัง)
+            กดที่รูปเพื่อเปลี่ยน (ดึงจาก LINE เป็นค่าเริ่มต้น)
           </p>
         </div>
 
@@ -134,9 +167,19 @@ export default function RegisterForm({ categories, submitAction }: { categories:
           </div>
         </div>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="experience">ประสบการณ์ (ปี)</label>
-          <input type="number" id="experience" name="experience" min="0" placeholder="เช่น 5" required />
+        <div className={styles.row}>
+          <div className={styles.col}>
+            <div className={styles.formGroup}>
+              <label htmlFor="experience">ประสบการณ์ (ปี)</label>
+              <input type="number" id="experience" name="experience" min="0" placeholder="เช่น 5" required />
+            </div>
+          </div>
+          <div className={styles.col}>
+            <div className={styles.formGroup}>
+              <label htmlFor="startingRate">อัตราค่าจ้างเริ่มต้น (บาท)</label>
+              <input type="number" id="startingRate" name="startingRate" min="0" placeholder="เช่น 500 (ไม่บังคับ)" />
+            </div>
+          </div>
         </div>
 
         <div className={styles.formGroup}>

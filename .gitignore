@@ -40,6 +40,7 @@ next-env.d.ts
 .impeccable/
 .cursor/
 .vscode/
+.agents/
 
 # Playwright test artifacts
 /test-results/
@@ -47,14 +48,11 @@ next-env.d.ts
 /blob-report/
 /playwright/.cache/
 
-# Temporary Screenshots & Notes in Root
-/Screenshot*.png
-/chat_*.png
-/home_*.png
-/rubjangnk_ui_mockup.png
-/Thinking.md
+# Temporary screenshots & mockups in root
+*.png
 
-# Local-only documentation logs
+# Local-only working notes (not part of the product)
+/Thinking.md
 /SPEED_ANALYSIS.md
 /WALKTHROUGH.md
-
+/review.md

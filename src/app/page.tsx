@@ -56,6 +56,7 @@ export default async function Home() {
             experience_years,
             latitude,
             longitude,
+            starting_rate,
             service_categories!inner(name_th)
           ),
           profiles!inner(display_name, avatar_url)
@@ -80,19 +81,23 @@ export default async function Home() {
     { id: "6", name: "ช่างก่อสร้าง", icon: "🧱" },
   ];
 
-  const technicians = dbTechnicians && dbTechnicians.length > 0 ? dbTechnicians.map(t => ({
-    id: t.id,
-    name: t.profiles?.display_name || t.technician_applications?.full_name || 'ช่างนิรนาม',
-    category: (t.technician_applications as any)?.service_categories?.name_th || 'ทั่วไป',
-    avatarUrl: t.profiles?.avatar_url || null,
-    isVerified: t.is_verified,
-    isFeatured: t.is_featured,
-    rating: t.rating_avg,
-    reviewCount: t.review_count,
-    experience: t.technician_applications?.experience_years || 0,
-    latitude: (t.technician_applications as any)?.latitude || t.latitude || null,
-    longitude: (t.technician_applications as any)?.longitude || t.longitude || null,
-  })) : [
+  const technicians = dbTechnicians && dbTechnicians.length > 0 ? dbTechnicians.map((t: any) => {
+    const app = t.technician_applications;
+    return {
+      id: t.id,
+      name: t.profiles?.display_name || app?.full_name || 'ช่างนิรนาม',
+      category: app?.service_categories?.name_th || 'ทั่วไป',
+      avatarUrl: t.profiles?.avatar_url || null,
+      isVerified: t.is_verified,
+      isFeatured: t.is_featured,
+      rating: t.rating_avg ?? null,
+      reviewCount: t.review_count,
+      experience: app?.experience_years || 0,
+      startingRate: app?.starting_rate || null,
+      latitude: app?.latitude || t.latitude || null,
+      longitude: app?.longitude || t.longitude || null,
+    };
+  }) : [
     {
       id: "11111111-1111-1111-1111-111111111111",
       name: "ช่างสมชาย รับซ่อมแอร์",

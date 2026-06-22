@@ -24,11 +24,13 @@ interface Technician {
   id: string;
   name: string;
   category: string;
+  avatarUrl?: string | null;
   isVerified: boolean;
   isFeatured: boolean;
-  rating: number;
+  rating: number | null;
   reviewCount: number;
   experience: number;
+  startingRate?: number | null;
   latitude?: number | null;
   longitude?: number | null;
   distance?: number;

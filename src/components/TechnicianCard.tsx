@@ -11,9 +11,10 @@ interface TechnicianCardProps {
   avatarUrl?: string | null;
   isVerified: boolean;
   isFeatured: boolean;
-  rating: number;
+  rating: number | null;
   reviewCount: number;
   experience: number;
+  startingRate?: number | null;
   distance?: number;
 }
 
@@ -27,6 +28,7 @@ export default function TechnicianCard({
   rating,
   reviewCount,
   experience,
+  startingRate,
   distance
 }: TechnicianCardProps) {
   const { liff, isLoggedIn } = useLiff();
@@ -77,14 +79,20 @@ export default function TechnicianCard({
         </div>
         
         <div className={styles.details}>
-          <div>⭐ {rating.toFixed(1)} ({reviewCount} รีวิว)</div>
+          <div>
+            {rating != null && reviewCount > 0
+              ? `⭐ ${rating.toFixed(1)} (${reviewCount} รีวิว)`
+              : '⭐ ยังไม่มีรีวิว'}
+          </div>
           <div>มีประสบการณ์ {experience} ปี</div>
           {distance !== undefined && (
             <div style={{ color: '#d32f2f', fontWeight: 'bold' }}>
               📍 อยู่ห่างจากคุณ {distance.toFixed(1)} กม.
             </div>
           )}
-          <div className={styles.price}>Starting at ฿500</div>
+          {startingRate != null && (
+            <div className={styles.price}>เริ่มต้น ฿{startingRate.toLocaleString()}</div>
+          )}
         </div>
         
         <div className={styles.actions}>
@@ -97,11 +105,9 @@ export default function TechnicianCard({
       </div>
       <div className={styles.imagePlaceholder}>
         {avatarUrl ? (
-          <img src={avatarUrl} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />
+          <img src={avatarUrl} alt={name} className={styles.avatarImage} />
         ) : (
-          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontSize: '13px' }}>
-            รูปช่าง
-          </div>
+          <div className={styles.avatarPlaceholder}>รูปช่าง</div>
         )}
       </div>
     </div>
