@@ -2,6 +2,8 @@ import styles from "./page.module.css";
 import { createClient } from "@/utils/supabase/server";
 import DistanceSearchList from "@/components/DistanceSearchList";
 
+export const dynamic = 'force-dynamic';
+
 function getCategoryIcon(name: string) {
   const normalized = name.toLowerCase();
   
