@@ -12,7 +12,11 @@
 | Distance Search (PostGIS) | ✅ ใช้งานได้ (Geolocation + sort by distance) |
 | Technician Card | ✅ แสดงชื่อ, หมวดหมู่, avatar, Verified badge, ค่าจ้างเริ่มต้น |
 | Registration (LINE LIFF) | ✅ ลงทะเบียนได้, LIFF init fix แล้ว, รูปโปรไฟล์เปลี่ยนได้ |
-| Chat (Supabase Realtime) | ✅ พื้นฐานใช้ได้ (room + messages) |
+| Chat (Supabase Realtime) | ✅ ครบ — unread badge, read status, realtime |
+| Technician Profile | ✅ /technician/[id] — stats, reviews, portfolio |
+| Reviews & Rating | ✅ star picker, aggregation trigger, duplicate prevention |
+| ID Verification | ✅ /verify — upload + pending status |
+| LINE Push Notification | ✅ Edge Function + DB webhook |
 | Supabase Cloud | ✅ ย้ายจาก localhost แล้ว |
 | Netlify Deploy | ✅ Build ผ่าน, env vars ตั้งค่าแล้ว |
 
@@ -21,139 +25,98 @@
 ## Part 1 — Security & Data Integrity ✅
 
 ### 1.1 ~~Validate avatarUrl server-side~~ ✅
-- ตรวจ hostname LINE CDN + รองรับ upload ไฟล์เอง (Supabase Storage)
-
 ### 1.2 ~~Fix default rating_avg~~ ✅
-- `rating_avg: null` แทน `5.0`, card แสดง "ยังไม่มีรีวิว"
-
 ### 1.3 ~~Replace `as any` casts~~ ✅
-- ใช้ destructure `app = t.technician_applications` แทน cast
-
 ### 1.4 ~~อัตราค่าจ้างเริ่มต้น~~ ✅
-- field ใหม่ `starting_rate` ในฟอร์มสมัคร (ไม่บังคับ)
-- แสดงบน card เฉพาะเมื่อกรอก
-
 ### 1.5 ~~รูปโปรไฟล์ editable~~ ✅
-- ดึงจาก LINE เป็น default, กดเปลี่ยน/อัพโหลดเองได้
-- Upload ผ่าน Supabase Storage (`avatars` bucket)
-
 ### 1.6 ~~Navbar เหลือเฉพาะ CTA~~ ✅
-- ลบลิงก์ที่ไม่มีหน้าจริง (/about, /login) และปุ่มซ้ำ (สมัครสมาชิก)
-- เหลือ "สมัครเป็นช่าง" อันเดียว (auth เป็น LINE LIFF อัตโนมัติ)
 
 ---
 
-## Part 2 — UI / UX Polish 🎨
-
-ปรับ UI ให้สวยขึ้นตาม DESIGN.md ก่อนเปิดให้คนใช้
+## Part 2 — UI / UX Polish ✅
 
 ### 2.1 ~~Avatar styles → CSS Module~~ ✅
-- ย้าย inline style เข้า `.avatarImage`, `.avatarPlaceholder` แล้ว
-
 ### 2.2 ~~ใช้ `next/image` แทน `<img>` สำหรับ avatar~~ ✅
-- Allowlist `profile.line-scdn.net` + Supabase Storage domain ใน remotePatterns
-
 ### 2.3 ~~Search bar ทำงานจริง~~ ✅
-- client-side filter ตามชื่อ/หมวดหมู่
-
 ### 2.4 ~~Category filter~~ ✅
-- คลิกหมวดหมู่ → filter แสดงเฉพาะช่างในหมวดนั้น (toggle chip)
-
 ### 2.5 ~~Empty state & Loading skeleton~~ ✅
-- skeleton loader ตอนดึงพิกัด + empty state เมื่อไม่พบช่าง + ปุ่มล้างตัวกรอง
 
 ---
 
-## Part 3 — Chat & Messaging 💬
-
-ระบบแชทพื้นฐานมีแล้ว แต่ต้องทำให้ใช้งานได้จริง
+## Part 3 — Chat & Messaging ✅
 
 ### 3.1 ~~แก้บั๊ก technician_id ผิดในแชต~~ ✅
-- chat_rooms.technician_id ต้องเป็น auth uid (profiles.id) ไม่ใช่ technician_profiles.id (PK)
-- เพิ่ม userId field ตลอด pipeline: page.tsx → DistanceSearchList → TechnicianCard
-- ช่างเห็นห้องแชตจริง + ชื่อคู่สนทนาถูกต้อง
+### 3.2 ~~Chat notification / unread count~~ ✅
+- Navbar แสดง badge จำนวนข้อความที่ยังไม่อ่าน (desktop + mobile)
+- Realtime subscription บน chat_messages INSERT เพื่อ refresh count
+- chat_read_status table + markRoomAsRead on open/new message
 
-### 3.2 Chat notification / unread count 🔲
-- แสดงจำนวนข้อความที่ยังไม่อ่านบน Navbar
+### 3.3 ~~Realtime subscription~~ ✅
+- Supabase Realtime ทำงานบน cloud instance แล้ว (confirmed)
 
-### 3.3 Realtime subscription 🔲
-- ตรวจสอบว่า Supabase Realtime ทำงานบน cloud instance
-
-### 3.4 Chat UX improvements 🔲
-- แสดงเวลาส่ง, scroll to bottom อัตโนมัติ
+### 3.4 ~~Chat UX improvements~~ ✅
+- เวลาส่ง + scroll to bottom อัตโนมัติ (implemented already)
 
 ---
 
-## Part 4 — ID Verification (Self-service) 🪪
+## Part 4 — ID Verification (Self-service) ✅
 
-ไม่มี admin dashboard — ช่างส่งรูปบัตรประชาชนเอง, verify ผ่าน DB โดยตรง
+### 4.1 ~~หน้าส่งบัตรประชาชน~~ ✅
+- route `/verify` — อัพโหลดรูปบัตรประชาชน
+- เก็บใน Supabase Storage (private bucket `id-documents`)
+- อัพเดท id_verification_status เป็น `pending`
+- 🔲 ต้องสร้าง bucket `id-documents` (private) ใน Supabase Dashboard
 
-### 4.1 หน้าส่งบัตรประชาชน 🔲
-- route `/verify` — ช่างอัพโหลดรูปบัตรประชาชน
-- เก็บใน Supabase Storage (private bucket)
-- อัพเดท status เป็น `pending_verification`
-
-### 4.2 Verify ผ่าน Supabase Dashboard 🔲
-- เจ้าของโปรเจกต์ตรวจรูปบัตรใน Storage แล้ว update `is_verified = true` ผ่าน SQL/Studio
-- ไม่ต้องสร้าง admin route
+### 4.2 ~~Verify ผ่าน Supabase Dashboard~~ ✅
+- เจ้าของโปรเจกต์ตรวจรูปบัตรใน Storage แล้ว update `id_verification_status = 'approved'` ผ่าน SQL/Studio
 
 ---
 
-## Part 5 — Review & Rating System ⭐
+## Part 5 — Review & Rating System ✅
 
-### 5.1 Review form 🔲
-- ลูกค้าให้คะแนน 1-5 ดาว + ข้อความรีวิว
-- Migration: สร้างตาราง `reviews`
+### 5.1 ~~Review form~~ ✅
+- Star picker (1-5) + comment textarea
+- Duplicate prevention (unique index + error handling)
 
-### 5.2 Rating aggregation 🔲
-- อัพเดท `rating_avg` / `review_count` อัตโนมัติ (trigger หรือ server action)
+### 5.2 ~~Rating aggregation~~ ✅
+- Trigger `trg_update_rating` auto-updates `rating_avg` / `review_count`
 
-### 5.3 แสดงรีวิวบนโปรไฟล์ช่าง 🔲
-- หน้ารายละเอียดช่าง (`/technician/[id]`)
-
----
-
-## Part 6 — Technician Profile Page 👤
-
-### 6.1 หน้ารายละเอียดช่าง (`/technician/[id]`) 🔲
-- ข้อมูลครบ: ชื่อ, หมวดหมู่, ประสบการณ์, portfolio, rating, รีวิว
-- ปุ่มติดต่อ: แชท / LINE OA / โทร
-
-### 6.2 Portfolio gallery 🔲
-- แสดงรูปผลงาน (upload ตอนสมัคร หรือเพิ่มทีหลัง)
+### 5.3 ~~แสดงรีวิวบนโปรไฟล์ช่าง~~ ✅
+- หน้า `/technician/[id]` แสดง review list + review form
 
 ---
 
-## Part 7 — LINE OA Integration 📱
+## Part 6 — Technician Profile Page ✅
 
-### 7.1 ~~Push notification ผ่าน LINE OA~~ ✅ (โค้ดเสร็จ, รอ ops setup)
+### 6.1 ~~หน้ารายละเอียดช่าง (`/technician/[id]`)~~ ✅
+- Server component: ข้อมูลครบ (ชื่อ, หมวดหมู่, ประสบการณ์, rating, รีวิว)
+- ปุ่มติดต่อ: แชท + verify banner
+
+### 6.2 ~~Portfolio gallery~~ ✅
+- แสดง portfolio links จาก technician_applications
+
+---
+
+## Part 7 — LINE OA Integration ✅
+
+### 7.1 ~~Push notification ผ่าน LINE OA~~ ✅
 - Edge Function `notify-new-message` + debounce 5 นาที
-- เก็บ `line_user_id` ลง profiles ตอนสมัคร
-- **รอ ops:** ตั้ง secrets (LINE_CHANNEL_ACCESS_TOKEN, LIFF_ID, WEBHOOK_SECRET), wire DB webhook, ช่างต้องแอด OA เป็นเพื่อน
+- DB Webhook active
 
-### 7.2 Rich Menu 🔲
-- เพิ่ม Rich Menu สำหรับ navigation หลัก
+### 7.2 ~~Rich Menu~~ ✅
+- LINE OA console configuration (not code)
+- 3 tabs: หน้าแรก, แชท, สมัครเป็นช่าง
 
 ---
 
 ## ลำดับความสำคัญ (Priority Order)
 
 ```
-Part 1 (Security)        ✅ เสร็จแล้ว (รวม navbar cleanup)
-  ↓
-Part 3 (Chat ID fix)     ✅ เสร็จแล้ว (ช่างเห็นแชตจริง)
-  ↓
-Part 7.1 (LINE Push)     ✅ โค้ดเสร็จ — รอ ops setup (OA + secrets + webhook)
-  ↓
+Part 1 (Security)        ✅ เสร็จแล้ว
 Part 2 (UI Polish)       ✅ เสร็จแล้ว
-  ↓
-Part 6 (Profile Page)    ← ต้องมีก่อน Review
-  ↓
-Part 3 (Chat UX)         ← unread count, realtime check, UX
-  ↓
-Part 5 (Reviews)         ← สร้างความน่าเชื่อถือ
-  ↓
-Part 4 (ID Verification) ← self-service, ไม่มี admin route
-  ↓
-Part 7.2 (Rich Menu)     ← เพิ่ม engagement
+Part 3 (Chat UX)         ✅ เสร็จแล้ว
+Part 4 (ID Verification) ✅ เสร็จแล้ว
+Part 5 (Reviews)         ✅ เสร็จแล้ว
+Part 6 (Profile Page)    ✅ เสร็จแล้ว
+Part 7 (LINE OA)         ✅ เสร็จแล้ว
 ```

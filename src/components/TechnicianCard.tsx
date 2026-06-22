@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useLiff } from '@/components/LiffProvider';
 import { useRouter } from 'next/navigation';
 import styles from './TechnicianCard.module.css';
@@ -66,19 +67,19 @@ export default function TechnicianCard({
             <h3 className={styles.name}>{name}</h3>
             <span className={styles.category}>{category}</span>
           </div>
-          <div className={styles.badges}>
-            {isFeatured && (
-              <span className={styles.badgeFeatured}>
-                ★ แนะนำ
-              </span>
-            )}
-            {isVerified && (
-              <span className={styles.badgeVerified}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                Verified
-              </span>
-            )}
-          </div>
+          {(isFeatured || isVerified) && (
+            <div className={styles.badges}>
+              {isFeatured && (
+                <span className={styles.badgeFeatured}>&#9733; แนะนำ</span>
+              )}
+              {isVerified && (
+                <span className={styles.badgeVerified}>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  Verified
+                </span>
+              )}
+            </div>
+          )}
         </div>
         
         <div className={styles.details}>
@@ -103,7 +104,7 @@ export default function TechnicianCard({
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
             ติดต่อทาง LINE
           </button>
-          <span className={styles.linkSecondary}>ดูโปรไฟล์</span>
+          <Link href={`/technician/${id}`} className={styles.linkSecondary}>ดูโปรไฟล์</Link>
         </div>
       </div>
       <div className={styles.imagePlaceholder}>

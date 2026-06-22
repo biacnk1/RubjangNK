@@ -27,17 +27,36 @@
   gap: var(--spacing-md);
 }
 
-.navLink {
+.chatLink {
+  position: relative;
   color: var(--text-primary);
-  opacity: 0.85;
-  transition: all 0.2s ease;
-  font-weight: 500;
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  padding: 6px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
 }
 
-.navLink:hover {
-  opacity: 1;
-  color: var(--primary);
+.chatLink:hover {
+  background-color: var(--neutral-surface);
+}
+
+.unreadBadge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  background: #d32f2f;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
 }
 
 .registerBtn {
@@ -72,6 +91,23 @@
 
 .menuToggle:hover {
   background-color: var(--neutral-surface);
+}
+
+.menuToggleWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.menuDot {
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  background: #d32f2f;
+  border-radius: 50%;
+  border: 2px solid var(--neutral-bg);
 }
 
 .mobileMenu {
@@ -112,10 +148,27 @@
     padding: 6px 0;
     border-bottom: 1px solid rgba(0, 0, 0, 0.02);
     transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .mobileLink:hover {
     color: var(--primary);
+  }
+
+  .unreadBadgeMobile {
+    background: #d32f2f;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
   }
 
   .mobileRegisterBtn {

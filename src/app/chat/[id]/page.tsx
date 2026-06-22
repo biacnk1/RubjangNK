@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
+import { markRoomAsRead } from '@/app/technician/[id]/actions';
 import ChatSidebar from '@/components/ChatSidebar';
 import styles from './page.module.css';
 
@@ -72,8 +73,9 @@ export default function ChatRoomPage({ params }: { params: { id: string } }) {
         setLoading(false);
       }
     }
-    
+
     loadData();
+    markRoomAsRead(roomId);
 
     // Realtime subscription
     const channel = supabase
@@ -89,6 +91,7 @@ export default function ChatRoomPage({ params }: { params: { id: string } }) {
             if (prev.some(m => m.id === payload.new.id)) return prev;
             return [...prev, payload.new];
           });
+          markRoomAsRead(roomId);
         }
       )
       .on('postgres_changes', {

@@ -36,14 +36,14 @@ export default async function Home() {
   }
 
   const categories = dbCategories && dbCategories.length > 0 ? dbCategories.map(c => ({
-    id: c.id, name: c.name_th
+    id: c.id, name: c.name_th, iconUrl: c.icon_url || null,
   })) : [
-    { id: "1", name: "ช่างแอร์" },
-    { id: "2", name: "ช่างประปา" },
-    { id: "3", name: "ช่างไฟฟ้า" },
-    { id: "4", name: "แม่บ้าน" },
-    { id: "5", name: "ช่างซ่อมบำรุง" },
-    { id: "6", name: "ช่างก่อสร้าง" },
+    { id: "1", name: "ช่างแอร์", iconUrl: null },
+    { id: "2", name: "ช่างประปา", iconUrl: null },
+    { id: "3", name: "ช่างไฟฟ้า", iconUrl: null },
+    { id: "4", name: "แม่บ้าน", iconUrl: null },
+    { id: "5", name: "ช่างซ่อมบำรุง", iconUrl: null },
+    { id: "6", name: "ช่างก่อสร้าง", iconUrl: null },
   ];
 
   const technicians = dbTechnicians && dbTechnicians.length > 0 ? dbTechnicians.map((t: any) => {

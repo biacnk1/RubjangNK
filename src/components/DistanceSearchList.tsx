@@ -23,6 +23,7 @@ function deg2rad(deg: number): number {
 interface Category {
   id: string;
   name: string;
+  iconUrl?: string | null;
 }
 
 interface Technician {
@@ -61,6 +62,17 @@ function SkeletonCard() {
     </div>
   );
 }
+
+const CATEGORY_ICONS: Record<string, string> = {
+  'ช่างแอร์': '❄️',
+  'ช่างประปา': '🔧',
+  'ช่างไฟฟ้า': '💡',
+  'ช่างซ่อมบำรุง/ต่อเติม': '🏗️',
+  'ช่างซ่อมบำรุง': '🏗️',
+  'แม่บ้าน/ทำความสะอาด': '🧹',
+  'แม่บ้าน': '🧹',
+  'ช่างก่อสร้าง': '🏠',
+};
 
 export default function DistanceSearchList({ initialTechnicians, categories }: Props) {
   const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians);
@@ -127,6 +139,27 @@ export default function DistanceSearchList({ initialTechnicians, categories }: P
 
   return (
     <div>
+      {/* Category icon grid */}
+      <h2 className={styles.sectionHeading}>หมวดหมู่บริการ</h2>
+      <div className={styles.categoryGrid}>
+        {categories.map(cat => (
+          <button
+            key={cat.id}
+            className={`${styles.categoryCard} ${selectedCategory === cat.name ? styles.categoryCardActive : ''}`}
+            onClick={() => handleCategoryClick(cat.name)}
+          >
+            {cat.iconUrl ? (
+              <img src={cat.iconUrl} alt={cat.name} className={styles.categoryIcon} />
+            ) : (
+              <span className={styles.categoryEmoji}>{CATEGORY_ICONS[cat.name] || '🔨'}</span>
+            )}
+            <span className={styles.categoryName}>{cat.name}</span>
+          </button>
+        ))}
+      </div>
+
+      <h2 className={styles.sectionHeading}>ช่างและแม่บ้านแนะนำในหนองคาย</h2>
+
       {/* Search */}
       <div className={styles.searchBox}>
         <input
@@ -141,19 +174,6 @@ export default function DistanceSearchList({ initialTechnicians, categories }: P
         </button>
       </div>
 
-      {/* Category chips */}
-      <div className={styles.categoryChips}>
-        {categories.map(cat => (
-          <button
-            key={cat.id}
-            className={`${styles.chip} ${selectedCategory === cat.name ? styles.chipActive : ''}`}
-            onClick={() => handleCategoryClick(cat.name)}
-          >
-            {cat.name}
-          </button>
-        ))}
-      </div>
-
       {/* Location button */}
       <div className={styles.locationRow}>
         <button
@@ -161,7 +181,7 @@ export default function DistanceSearchList({ initialTechnicians, categories }: P
           disabled={isLocating}
           className={`${styles.locationBtn} ${userLocation ? styles.locationBtnActive : ''}`}
         >
-          {isLocating ? '📍 กำลังค้นหาพิกัด...' : userLocation ? '📍 อัปเดตพิกัด' : '📍 ค้นหาช่างใกล้บ้าน'}
+          {isLocating ? '📍 กำลังค้นหาพิกัด...' : userLocation ? '📍 อัปเดตพิกัด' : '📍 ดึงพิกัดเพื่อค้นหาช่างใกล้บ้าน'}
         </button>
         {userLocation && (
           <span className={styles.locationInfo}>

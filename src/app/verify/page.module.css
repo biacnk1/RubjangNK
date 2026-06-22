@@ -1,0 +1,151 @@
+.page {
+  min-height: calc(100vh - 64px);
+  padding: 48px 0;
+}
+
+.container {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 15px;
+  margin-bottom: 24px;
+}
+
+.message {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 15px;
+  padding: 48px 0;
+}
+
+/* Status card */
+.statusCard {
+  background: var(--neutral-bg);
+  border: 1px solid var(--neutral-border);
+  border-radius: var(--rounded-md);
+  padding: 32px;
+  text-align: center;
+}
+
+.statusIcon {
+  font-size: 48px;
+  color: var(--line-green);
+  margin-bottom: 12px;
+}
+
+.statusIconPending {
+  font-size: 48px;
+  color: var(--accent-orange);
+  margin-bottom: 12px;
+}
+
+.statusText {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.statusHint {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+/* Form */
+.formCard {
+  background: var(--neutral-bg);
+  border: 1px solid var(--neutral-border);
+  border-radius: var(--rounded-md);
+  padding: 24px;
+}
+
+.dropZone {
+  border: 2px dashed var(--neutral-border);
+  border-radius: var(--rounded-sm);
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropZone:hover {
+  border-color: var(--primary);
+}
+
+.dropContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+}
+
+.dropContent p {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.dropHint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.previewImg {
+  max-width: 100%;
+  max-height: 240px;
+  border-radius: var(--rounded-sm);
+  object-fit: contain;
+}
+
+.guidelines {
+  margin: 16px 0;
+  padding-left: 20px;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+.errorText {
+  color: #d32f2f;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.submitBtn {
+  width: 100%;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 12px;
+  border-radius: var(--rounded-sm);
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.submitBtn:hover {
+  background: #09263a;
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
