@@ -118,21 +118,116 @@ export default async function Home() {
     }
   ];
 
-  return (
-    <div className={styles.main}>
-      <section className={styles.hero}>
-        <div className="container">
-          <h1 className={styles.heroTitle}>หาช่าง - แม่บ้าน ใกล้บ้านคุณในหนองคาย</h1>
-          <p className={styles.heroSubtitle}>บริการคุณภาพ เชื่อถือได้ ค้นหาง่าย ครบจบในที่เดียว</p>
-          <p className={styles.heroHighlight}>ฟรีไม่มีค่าคอม • ช่าง Verified</p>
-        </div>
-      </section>
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "rubjangNK",
+    "url": "https://rubjangnk.netlify.app",
+    "description": "แพลตฟอร์มหาช่างและแม่บ้านในหนองคาย ฟรี ไม่มีค่าคอมมิชชั่น",
+    "inLanguage": "th",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://rubjangnk.netlify.app/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
 
-      <section className={styles.section}>
-        <div className="container">
-          <DistanceSearchList initialTechnicians={technicians} categories={categories} />
-        </div>
-      </section>
-    </div>
+  const localBusinessSchema = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "rubjangNK",
+    "description": "แพลตฟอร์มหาช่างและแม่บ้านในหนองคาย",
+    "url": "https://rubjangnk.netlify.app",
+    "areaServed": {
+      "@type": "City",
+      "name": "หนองคาย",
+      "sameAs": "https://th.wikipedia.org/wiki/จังหวัดหนองคาย"
+    },
+    "serviceType": ["ช่างแอร์", "ช่างประปา", "ช่างไฟฟ้า", "แม่บ้าน", "ช่างซ่อมบำรุง", "ช่างก่อสร้าง"],
+    "priceRange": "฿0 (ฟรีสำหรับลูกค้า)",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "หนองคาย",
+      "addressCountry": "TH"
+    }
+  };
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "rubjangNK คืออะไร?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "rubjangNK คือแพลตฟอร์มออนไลน์สำหรับหาช่างและแม่บ้านในจังหวัดหนองคาย ใช้งานฟรี ไม่มีค่าคอมมิชชั่น ช่างทุกคนผ่านการยืนยันตัวตน"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "ค่าบริการหาช่างผ่าน rubjangNK เท่าไหร่?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "ฟรี ไม่มีค่าใช้จ่ายสำหรับลูกค้า และไม่หักค่าคอมมิชชั่นจากช่าง ลูกค้าตกลงราคากับช่างโดยตรง"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "ช่างใน rubjangNK ผ่านการยืนยันตัวตนไหม?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "ช่างที่มีเครื่องหมาย Verified ผ่านการยืนยันตัวตนด้วยบัตรประชาชนแล้ว ลูกค้าสามารถดูคะแนนรีวิวและประสบการณ์ก่อนตัดสินใจ"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "หาช่างแอร์หนองคายได้ที่ไหน?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "เข้าเว็บ rubjangnk.netlify.app เลือกหมวด 'ช่างแอร์' จะแสดงรายชื่อช่างแอร์ในหนองคายพร้อมคะแนนรีวิว ราคาเริ่มต้น และระยะทางจากตำแหน่งคุณ"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "สมัครเป็นช่างใน rubjangNK ยังไง?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "เข้าหน้า 'ลงทะเบียน' กรอกข้อมูล เลือกหมวดบริการ ระบุประสบการณ์และราคาเริ่มต้น สมัครฟรี ไม่มีค่าใช้จ่าย"
+        }
+      }
+    ]
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <div className={styles.main}>
+        <section className={styles.hero}>
+          <div className="container">
+            <h1 className={styles.heroTitle}>หาช่าง - แม่บ้าน ใกล้บ้านคุณในหนองคาย</h1>
+            <p className={styles.heroSubtitle}>บริการคุณภาพ เชื่อถือได้ ค้นหาง่าย ครบจบในที่เดียว</p>
+            <p className={styles.heroHighlight}>ฟรีไม่มีค่าคอม • ช่าง Verified</p>
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <div className="container">
+            <DistanceSearchList initialTechnicians={technicians} categories={categories} />
+          </div>
+        </section>
+      </div>
+    </>
   );
 }

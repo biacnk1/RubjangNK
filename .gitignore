@@ -50,6 +50,7 @@ next-env.d.ts
 
 # Temporary screenshots & mockups in root
 *.png
+!public/**/*.png
 
 # Local-only working notes (not part of the product)
 /Thinking.md

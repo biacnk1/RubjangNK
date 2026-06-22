@@ -4,8 +4,61 @@ import { createClient } from '@/utils/supabase/server';
 import { notFound } from 'next/navigation';
 import ReviewForm from './ReviewForm';
 import styles from './page.module.css';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const supabase = createClient();
+
+  const { data: tech } = await supabase
+    .from('technician_profiles')
+    .select(`
+      *,
+      technician_applications!inner(
+        full_name,
+        experience_years,
+        starting_rate,
+        service_categories!inner(name_th)
+      ),
+      profiles!inner(display_name, avatar_url)
+    `)
+    .eq('id', params.id)
+    .single();
+
+  if (!tech) {
+    return {
+      title: 'ไม่พบข้อมูลช่าง | rubjangNK',
+    };
+  }
+
+  const app = tech.technician_applications;
+  const profile = tech.profiles;
+  const name = profile?.display_name || app?.full_name || 'ช่างนิรนาม';
+  const category = app?.service_categories?.name_th || 'ทั่วไป';
+  const experience = app?.experience_years || 0;
+  const rating = tech.rating_avg != null && tech.review_count > 0 ? Number(tech.rating_avg).toFixed(1) : '-';
+  const reviewCount = tech.review_count || 0;
+  const startingRate = app?.starting_rate != null ? Number(app.starting_rate).toLocaleString() : 'ไม่ระบุ';
+  const avatarUrl = profile?.avatar_url || 'https://rubjangnk.netlify.app/og-default.png';
+
+  const title = `${name} — ช่าง${category} หนองคาย | rubjangNK`;
+  const description = `ช่าง${category} ประสบการณ์ ${experience} ปี ⭐ ${rating} (${reviewCount} รีวิว) เริ่มต้น ฿${startingRate} — หนองคาย`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [avatarUrl],
+      type: 'profile',
+    },
+    alternates: {
+      canonical: `https://rubjangnk.netlify.app/technician/${params.id}`,
+    },
+  };
+}
 
 export default async function TechnicianProfilePage({ params }: { params: { id: string } }) {
   const supabase = createClient();
@@ -46,9 +99,62 @@ export default async function TechnicianProfilePage({ params }: { params: { id: 
 
   const alreadyReviewed = reviews?.some(r => r.reviewer_id === currentUserId) ?? false;
 
+  const name = profile?.display_name || app?.full_name || 'ช่างนิรนาม';
+  const category = app?.service_categories?.name_th || 'ทั่วไป';
+  const avatarUrl = profile?.avatar_url || '';
+  const startingRateRaw = app?.starting_rate;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": `บริการ${category} — ${name}`,
+    "description": `บริการ${category}ในหนองคาย โดย ${name}`,
+    "provider": {
+      "@type": "Person",
+      "name": name,
+      ...(avatarUrl ? { "image": avatarUrl } : {}),
+      "jobTitle": category,
+      "worksFor": {
+        "@type": "Organization",
+        "name": "rubjangNK"
+      }
+    },
+    "areaServed": {
+      "@type": "City",
+      "name": "หนองคาย"
+    },
+    ...(startingRateRaw != null ? {
+      "offers": {
+        "@type": "Offer",
+        "priceCurrency": "THB",
+        "price": startingRateRaw,
+        "priceSpecification": {
+          "@type": "PriceSpecification",
+          "priceCurrency": "THB",
+          "price": startingRateRaw,
+          "description": "ราคาเริ่มต้น"
+        }
+      }
+    } : {}),
+    ...(tech.review_count > 0 && tech.rating_avg != null ? {
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": tech.rating_avg,
+        "reviewCount": tech.review_count,
+        "bestRating": 5,
+        "worstRating": 1
+      }
+    } : {})
+  };
+
   return (
-    <div className={styles.page}>
-      <div className={styles.container}>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <div className={styles.page}>
+        <div className={styles.container}>
         {/* Header */}
         <div className={styles.profileHeader}>
           <div className={styles.avatarSection}>
@@ -195,5 +301,6 @@ export default async function TechnicianProfilePage({ params }: { params: { id: 
         </div>
       </div>
     </div>
+    </>
   );
 }

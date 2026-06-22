@@ -2,6 +2,15 @@ import styles from "./page.module.css";
 import { createClient } from "@/utils/supabase/server";
 import { submitTechnicianApplication } from "./actions";
 import RegisterForm from "./RegisterForm";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "สมัครเป็นช่าง/แม่บ้าน | rubjangNK — ฟรีไม่มีค่าคอม",
+  description: "ลงทะเบียนเป็นช่างหรือแม่บ้านในหนองคาย เพิ่มรายได้ หาลูกค้าง่าย ฟรีตลอดการใช้งาน ไม่มีค่าคอมมิชชั่น",
+  alternates: {
+    canonical: "https://rubjangnk.netlify.app/register",
+  },
+};
 
 export default async function RegisterPage() {
   const supabase = createClient();
