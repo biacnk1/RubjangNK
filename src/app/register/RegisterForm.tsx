@@ -112,6 +112,7 @@ export default function RegisterForm({ categories, submitAction }: { categories:
         {lat && <input type="hidden" name="latitude" value={lat} />}
         {lng && <input type="hidden" name="longitude" value={lng} />}
         {profile?.pictureUrl && <input type="hidden" name="avatarUrl" value={profile.pictureUrl} />}
+        {profile?.userId && <input type="hidden" name="lineUserId" value={profile.userId} />}
         
         <div className={styles.formGroup}>
           <label htmlFor="fullName">ชื่อ-นามสกุลจริง</label>

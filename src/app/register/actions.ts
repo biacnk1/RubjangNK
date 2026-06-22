@@ -32,6 +32,8 @@ export async function submitTechnicianApplication(formData: FormData) {
   const startingRateStr = formData.get('startingRate') as string | null;
   const startingRate = startingRateStr ? parseInt(startingRateStr) : null;
 
+  const lineUserId = (formData.get('lineUserId') as string) || user.email?.split('@')[0] || null;
+
   const adminSupabase = createAdminClient();
 
   // Handle avatar: uploaded file takes priority over LINE URL
@@ -71,6 +73,7 @@ export async function submitTechnicianApplication(formData: FormData) {
     display_name: fullName,
     role: 'technician',
     ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
+    ...(lineUserId ? { line_user_id: lineUserId } : {}),
   }, { onConflict: 'id' });
   
   if (profileError) console.error("Profile upsert error:", profileError);
